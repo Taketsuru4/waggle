@@ -1,0 +1,252 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCaregiverById } from "@/lib/data/caregivers";
+import { getUser } from "@/app/auth/actions";
+import { getUserPets } from "@/lib/data/dashboard";
+import { createBooking } from "@/app/bookings/actions";
+
+export default async function CaregiverPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const user = await getUser();
+  const caregiver = await getCaregiverById(id);
+  const userPets = user ? await getUserPets(user.id) : [];
+
+  if (!caregiver) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+        <div className="mx-auto max-w-3xl px-4 py-16 text-center text-zinc-600 dark:text-zinc-400">
+          Δεν βρέθηκε φροντιστής
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mx-auto max-w-5xl px-4 py-6">
+          <Link
+            href="/caregivers"
+            className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+          >
+            ← Επιστροφή στη λίστα
+          </Link>
+          <h1 className="mt-4 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            {caregiver.profiles?.full_name || "Φροντιστής"}
+          </h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            📍 {caregiver.city}
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Left column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Bio */}
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Σχετικά
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                {caregiver.bio || "Ο φροντιστής δεν έχει προσθέσει bio ακόμα."}
+              </p>
+            </div>
+
+            {/* Reviews */}
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                  Αξιολογήσεις
+                </h2>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Μέση βαθμολογία: {caregiver.stats.averageRating.toFixed(1)} (
+                  {caregiver.stats.totalReviews})
+                </span>
+              </div>
+              <div className="mt-4 space-y-4">
+                {caregiver.reviews.length === 0 ? (
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Δεν υπάρχουν αξιολογήσεις ακόμα.
+                  </p>
+                ) : (
+                  caregiver.reviews.map((r: any) => (
+                    <div
+                      key={r.id}
+                      className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                          {r.profiles?.full_name || "Χρήστης"}
+                        </div>
+                        <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                          Βαθμολογία: {r.rating}/5
+                        </div>
+                      </div>
+                      {r.comment && (
+                        <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                          {r.comment}
+                        </p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right column */}
+          <div className="space-y-6">
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Στοιχεία
+              </h3>
+              <div className="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <p>Εμπειρία: {caregiver.experience_years || "—"} έτη</p>
+                <p>
+                  Τιμή:{" "}
+                  {caregiver.hourly_rate
+                    ? `${caregiver.hourly_rate}€/ώρα`
+                    : "—"}
+                </p>
+                <p>
+                  Διαθεσιμότητα:{" "}
+                  {caregiver.available ? "Διαθέσιμος" : "Μη διαθέσιμος"}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Υπηρεσίες
+              </h3>
+              <div className="mt-3 flex flex-wrap gap-2 text-sm">
+                {caregiver.accepts_dogs && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
+                    🐕 Σκύλοι
+                  </span>
+                )}
+                {caregiver.accepts_cats && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
+                    🐈 Γάτες
+                  </span>
+                )}
+                {caregiver.accepts_birds && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
+                    🦜 Πουλιά
+                  </span>
+                )}
+                {caregiver.accepts_rabbits && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
+                    🐰 Κουνέλια
+                  </span>
+                )}
+                {caregiver.accepts_other && (
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
+                    🦎 Άλλα
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Κλείσε Κράτηση
+              </h3>
+              {!user ? (
+                <div className="mt-4">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Συνδέσου για να κλείσεις κράτηση
+                  </p>
+                  <Link
+                    href="/auth/login"
+                    className="mt-4 inline-block rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    Σύνδεση
+                  </Link>
+                </div>
+              ) : userPets.length === 0 ? (
+                <div className="mt-4">
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    Πρόσθεσε ένα κατοικίδιο πρώτα
+                  </p>
+                  <Link
+                    href="/dashboard/pets/new"
+                    className="mt-4 inline-block rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    Προσθήκη Κατοικιδίου
+                  </Link>
+                </div>
+              ) : (
+                <form action={createBooking} className="mt-4 space-y-4">
+                  <input type="hidden" name="caregiver_id" value={id} />
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Κατοικίδιο
+                    </label>
+                    <select
+                      name="pet_id"
+                      required
+                      className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50"
+                    >
+                      <option value="">Επίλεξε κατοικίδιο</option>
+                      {userPets.map((pet) => (
+                        <option key={pet.id} value={pet.id}>
+                          {pet.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Από
+                    </label>
+                    <input
+                      type="date"
+                      name="start_date"
+                      required
+                      className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Έως
+                    </label>
+                    <input
+                      type="date"
+                      name="end_date"
+                      required
+                      className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Σημειώσεις
+                    </label>
+                    <textarea
+                      name="notes"
+                      rows={3}
+                      className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50"
+                      placeholder="Πρόσθετες πληροφορίες..."
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                  >
+                    Κλείσε Κράτηση
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

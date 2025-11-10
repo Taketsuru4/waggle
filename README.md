@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Waggle - Pet Sitting Platform
 
-## Getting Started
+Εφαρμογή που συνδέει ιδιοκτήτες κατοικιδίων με επαγγελματίες φροντίδας.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** - React Framework με App Router
+- **TypeScript** - Type Safety
+- **Tailwind CSS** - Styling
+- **Supabase** - Backend & Authentication
+- **Biome** - Linting
+
+## Ξεκινώντας
+
+### 1. Εγκατάσταση dependencies
+
+```bash
+npm install
+```
+
+### 2. Ρύθμιση Supabase
+
+1. Δημιούργησε ένα project στο [Supabase](https://supabase.com)
+2. Αντίγραψε το `.env.local.example` σε `.env.local`
+3. Συμπλήρωσε τα credentials από το Supabase dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 3. Εκτέλεση Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Άνοιξε [http://localhost:3000](http://localhost:3000) στο browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Δομή Project
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+waggle/
+├── app/              # Next.js App Router pages
+├── lib/              # Utility functions & Supabase clients
+│   └── supabase/     # Supabase client setup
+├── public/           # Static assets
+│   └── assets/       # Images & media files
+└── middleware.ts     # Supabase auth middleware
+```
 
-## Learn More
+## Χαρακτηριστικά
 
-To learn more about Next.js, take a look at the following resources:
+- 🐾 Δημιουργία προφίλ επαγγελματία
+- 📍 Αναζήτηση ανά περιοχή
+- 📞 Άμεση επικοινωνία
+- 👤 Authentication με Supabase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Σκοπός
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Η εφαρμογή λειτουργεί ως πλατφόρμα σύνδεσης - δεν διαχειρίζεται πληρωμές.

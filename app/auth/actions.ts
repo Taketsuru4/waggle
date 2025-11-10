@@ -1,0 +1,81 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+export async function signUp(formData: FormData) {
+  const supabase = await createClient();
+
+  const role =
+    (formData.get("role") as "owner" | "caregiver" | "both") || "owner";
+
+  const signUpPayload = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+    options: {
+      data: {
+        full_name: formData.get("full_name") as string,
+        role,
+      },
+    },
+  };
+
+  const { data: signUpData, error } = await supabase.auth.signUp(signUpPayload);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // Check if email confirmation is required
+  if (signUpData?.user && !signUpData.session) {
+    return {
+      error:
+        "Επιβεβαίωση email απαιτείται. Έλεγξε το email σου για το link επιβεβαίωσης.",
+    };
+  }
+
+  // Try to persist chosen role into profiles (trigger should have created the row)
+  if (signUpData?.user?.id) {
+    await supabase
+      .from("profiles")
+      .update({ role })
+      .eq("id", signUpData.user.id);
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+export async function signIn(formData: FormData) {
+  const supabase = await createClient();
+
+  const data = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
+
+  const { error } = await supabase.auth.signInWithPassword(data);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+export async function signOut() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  revalidatePath("/", "layout");
+  redirect("/auth/login");
+}
+
+export async function getUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+}
