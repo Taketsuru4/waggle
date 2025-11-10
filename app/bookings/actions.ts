@@ -163,14 +163,32 @@ export async function completeBooking(bookingId: string) {
     return { error: "Unauthorized" };
   }
 
-  // Either owner or caregiver can mark as completed
+  // Check if user is the owner
+  const { data: ownerCheck } = await supabase
+    .from("bookings")
+    .select("id")
+    .eq("id", bookingId)
+    .eq("owner_id", user.id)
+    .single();
+
+  // Check if user is the caregiver
+  const { data: caregiverCheck } = await supabase
+    .from("bookings")
+    .select("id, caregiver_profiles!inner(user_id)")
+    .eq("id", bookingId)
+    .eq("caregiver_profiles.user_id", user.id)
+    .single();
+
+  // User must be either owner or caregiver
+  if (!ownerCheck && !caregiverCheck) {
+    return { error: "Unauthorized" };
+  }
+
+  // Update booking status
   const { error } = await supabase
     .from("bookings")
     .update({ status: "completed" })
-    .eq("id", bookingId)
-    .or(
-      `owner_id.eq.${user.id},caregiver_id.in.(select id from caregiver_profiles where user_id = ${user.id})`,
-    );
+    .eq("id", bookingId);
 
   if (error) {
     console.error("Error completing booking:", error);

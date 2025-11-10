@@ -4,6 +4,8 @@ import { getCaregiverById } from "@/lib/data/caregivers";
 import { getUser } from "@/app/auth/actions";
 import { getUserPets } from "@/lib/data/dashboard";
 import { createBooking } from "@/app/bookings/actions";
+import { ReviewCard } from "@/components/review-card";
+import { RatingStars } from "@/components/rating-stars";
 
 export default async function CaregiverPage({
   params,
@@ -60,40 +62,50 @@ export default async function CaregiverPage({
 
             {/* Reviews */}
             <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-              <div className="flex items-center justify-between">
+              <div className="mb-6">
                 <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                   Αξιολογήσεις
                 </h2>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Μέση βαθμολογία: {caregiver.stats.averageRating.toFixed(1)} (
-                  {caregiver.stats.totalReviews})
-                </span>
+                {caregiver.stats.totalReviews > 0 && (
+                  <div className="mt-3 flex items-center gap-3">
+                    <RatingStars
+                      rating={Math.round(caregiver.stats.averageRating)}
+                      readonly
+                      size="md"
+                    />
+                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {caregiver.stats.averageRating.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                      ({caregiver.stats.totalReviews}{" "}
+                      {caregiver.stats.totalReviews === 1
+                        ? "αξιολόγηση"
+                        : "αξιολογήσεις"}
+                      )
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="mt-4 space-y-4">
+
+              <div className="space-y-4">
                 {caregiver.reviews.length === 0 ? (
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    Δεν υπάρχουν αξιολογήσεις ακόμα.
-                  </p>
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-700 dark:bg-zinc-900">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      Δεν υπάρχουν αξιολογήσεις ακόμα.
+                    </p>
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">
+                      Γίνε ο πρώτος που θα αξιολογήσει αυτόν τον φροντιστή!
+                    </p>
+                  </div>
                 ) : (
                   caregiver.reviews.map((r: any) => (
-                    <div
+                    <ReviewCard
                       key={r.id}
-                      className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                          {r.profiles?.full_name || "Χρήστης"}
-                        </div>
-                        <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                          Βαθμολογία: {r.rating}/5
-                        </div>
-                      </div>
-                      {r.comment && (
-                        <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                          {r.comment}
-                        </p>
-                      )}
-                    </div>
+                      rating={r.rating}
+                      comment={r.comment}
+                      reviewerName={r.profiles?.full_name || "Χρήστης"}
+                      createdAt={r.created_at}
+                    />
                   ))
                 )}
               </div>

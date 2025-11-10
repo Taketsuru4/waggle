@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { getUser } from "@/app/auth/actions";
 import { getBookingDetails } from "@/lib/data/dashboard";
 import { BookingActions } from "../booking-actions";
+import { ReviewSection } from "./review-section";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -173,56 +174,81 @@ export default async function BookingDetailPage({ params }: PageProps) {
             </div>
 
             {/* Pet Details */}
-            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
-                Κατοικίδιο
-              </h2>
+            {booking.pet ? (
+              <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
+                  Κατοικίδιο
+                </h2>
 
-              <div className="space-y-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                    {booking.pet.name}
-                  </h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {booking.pet.type}
-                    {booking.pet.breed && ` • ${booking.pet.breed}`}
-                  </p>
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                      {booking.pet.name}
+                    </h3>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      {booking.pet.type}
+                      {booking.pet.breed && ` • ${booking.pet.breed}`}
+                    </p>
+                  </div>
+
+                  {booking.pet.age && (
+                    <div>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        Ηλικία
+                      </p>
+                      <p className="mt-1 text-zinc-900 dark:text-zinc-50">
+                        {booking.pet.age} ετών
+                      </p>
+                    </div>
+                  )}
+
+                  {booking.pet.description && (
+                    <div>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        Περιγραφή
+                      </p>
+                      <p className="mt-1 text-zinc-900 dark:text-zinc-50">
+                        {booking.pet.description}
+                      </p>
+                    </div>
+                  )}
+
+                  {booking.pet.special_needs && (
+                    <div>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        Ειδικές Ανάγκες
+                      </p>
+                      <p className="mt-1 text-zinc-900 dark:text-zinc-50">
+                        {booking.pet.special_needs}
+                      </p>
+                    </div>
+                  )}
                 </div>
-
-                {booking.pet.age && (
-                  <div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      Ηλικία
-                    </p>
-                    <p className="mt-1 text-zinc-900 dark:text-zinc-50">
-                      {booking.pet.age} ετών
-                    </p>
-                  </div>
-                )}
-
-                {booking.pet.description && (
-                  <div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      Περιγραφή
-                    </p>
-                    <p className="mt-1 text-zinc-900 dark:text-zinc-50">
-                      {booking.pet.description}
-                    </p>
-                  </div>
-                )}
-
-                {booking.pet.special_needs && (
-                  <div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      Ειδικές Ανάγκες
-                    </p>
-                    <p className="mt-1 text-zinc-900 dark:text-zinc-50">
-                      {booking.pet.special_needs}
-                    </p>
-                  </div>
-                )}
               </div>
-            </div>
+            ) : (
+              <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
+                  Κατοικίδιο
+                </h2>
+                <p className="text-zinc-600 dark:text-zinc-400">
+                  Το κατοικίδιο δεν βρέθηκε ή έχει διαγραφεί.
+                </p>
+              </div>
+            )}
+
+            {/* Review Section (only for completed bookings by owner) */}
+            <ReviewSection
+              bookingId={booking.id}
+              bookingStatus={booking.status}
+              caregiverName={
+                isOwner
+                  ? otherParty.profile?.full_name ||
+                    otherParty.profile?.email ||
+                    "Φροντιστής"
+                  : ""
+              }
+              isOwner={isOwner}
+            />
 
             {/* Contact Info */}
             <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">

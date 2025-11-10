@@ -143,7 +143,7 @@ export async function getCaregiverStats(caregiverId: string) {
 }
 
 type BookingWithDetails = Booking & {
-  pet: Pet;
+  pet: Pet | null;
   owner: Profile;
   caregiver: CaregiverProfile & {
     profile: Profile;
