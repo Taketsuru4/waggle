@@ -137,17 +137,56 @@ export default async function CaregiversPage({ searchParams }: PageProps) {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-4 flex items-center justify-between border-t border-zinc-200 pt-4 dark:border-zinc-700">
-                      <div className="text-sm">
-                        {caregiver.experience_years && (
-                          <span className="text-zinc-600 dark:text-zinc-400">
-                            {caregiver.experience_years} έτη εμπειρίας
-                          </span>
+                    <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-700">
+                      <div className="flex items-center justify-between text-sm">
+                        <div>
+                          {caregiver.experience_years && (
+                            <span className="text-zinc-600 dark:text-zinc-400">
+                              {caregiver.experience_years} έτη εμπειρίας
+                            </span>
+                          )}
+                        </div>
+                        {caregiver.hourly_rate && (
+                          <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                            {caregiver.hourly_rate}€/ώρα
+                          </div>
                         )}
                       </div>
-                      {caregiver.hourly_rate && (
-                        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                          {caregiver.hourly_rate}€/ώρα
+
+                      {/* Contact Info */}
+                      {(caregiver.contact_phone ||
+                        caregiver.whatsapp ||
+                        caregiver.viber) && (
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          {caregiver.contact_phone && (
+                            <a
+                              href={`tel:${caregiver.contact_phone}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-1 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
+                            >
+                              📞 {caregiver.contact_phone}
+                            </a>
+                          )}
+                          {caregiver.whatsapp && (
+                            <a
+                              href={`https://wa.me/${caregiver.whatsapp.replace(/[^0-9]/g, "")}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800"
+                            >
+                              💬 WhatsApp
+                            </a>
+                          )}
+                          {caregiver.viber && (
+                            <a
+                              href={`viber://chat?number=${caregiver.viber.replace(/[^0-9]/g, "")}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-purple-700 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800"
+                            >
+                              💜 Viber
+                            </a>
+                          )}
                         </div>
                       )}
                     </div>

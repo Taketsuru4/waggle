@@ -127,6 +127,7 @@ export type Database = {
           available: boolean | null;
           bio: string | null;
           city: string;
+          contact_phone: string | null;
           created_at: string;
           experience_years: number | null;
           hourly_rate: number | null;
@@ -136,6 +137,8 @@ export type Database = {
           updated_at: string;
           user_id: string;
           verified: boolean | null;
+          viber: string | null;
+          whatsapp: string | null;
         };
         Insert: {
           accepts_birds?: boolean | null;
@@ -147,6 +150,7 @@ export type Database = {
           available?: boolean | null;
           bio?: string | null;
           city: string;
+          contact_phone?: string | null;
           created_at?: string;
           experience_years?: number | null;
           hourly_rate?: number | null;
@@ -156,6 +160,8 @@ export type Database = {
           updated_at?: string;
           user_id: string;
           verified?: boolean | null;
+          viber?: string | null;
+          whatsapp?: string | null;
         };
         Update: {
           accepts_birds?: boolean | null;
@@ -167,6 +173,7 @@ export type Database = {
           available?: boolean | null;
           bio?: string | null;
           city?: string;
+          contact_phone?: string | null;
           created_at?: string;
           experience_years?: number | null;
           hourly_rate?: number | null;
@@ -176,6 +183,8 @@ export type Database = {
           updated_at?: string;
           user_id?: string;
           verified?: boolean | null;
+          viber?: string | null;
+          whatsapp?: string | null;
         };
         Relationships: [
           {

@@ -42,6 +42,9 @@ export async function createCaregiverProfile(formData: FormData) {
       accepts_rabbits: acceptsRabbits,
       accepts_other: acceptsOther,
       available: true,
+      contact_phone: (formData.get("contact_phone") as string) || null,
+      whatsapp: (formData.get("whatsapp") as string) || null,
+      viber: (formData.get("viber") as string) || null,
     });
 
   if (caregiverError) {
@@ -109,6 +112,9 @@ export async function updateCaregiverProfile(formData: FormData) {
       accepts_rabbits: acceptsRabbits,
       accepts_other: acceptsOther,
       available: available,
+      contact_phone: (formData.get("contact_phone") as string) || null,
+      whatsapp: (formData.get("whatsapp") as string) || null,
+      viber: (formData.get("viber") as string) || null,
     })
     .eq("user_id", user.id);
 

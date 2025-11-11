@@ -232,6 +232,71 @@ export default async function CaregiverSetupPage() {
             </div>
           </div>
 
+          {/* Contact Information Section */}
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+              Στοιχεία Επικοινωνίας
+            </h2>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              Βοήθησε τους πελάτες να επικοινωνήσουν μαζί σου (προαιρετικό)
+            </p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label
+                  htmlFor="contact_phone"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  📞 Τηλέφωνο Επικοινωνίας
+                </label>
+                <input
+                  id="contact_phone"
+                  name="contact_phone"
+                  type="tel"
+                  className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50 dark:placeholder-zinc-500"
+                  placeholder="6912345678"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="whatsapp"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  💬 WhatsApp
+                </label>
+                <input
+                  id="whatsapp"
+                  name="whatsapp"
+                  type="tel"
+                  className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50 dark:placeholder-zinc-500"
+                  placeholder="6912345678"
+                />
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  Οι πελάτες θα μπορούν να σε στείλουν μήνυμα στο WhatsApp
+                </p>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="viber"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  💜 Viber
+                </label>
+                <input
+                  id="viber"
+                  name="viber"
+                  type="tel"
+                  className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-50 dark:placeholder-zinc-500"
+                  placeholder="6912345678"
+                />
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  Οι πελάτες θα μπορούν να σε στείλουν μήνυμα στο Viber
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Submit */}
           <div className="flex gap-4">
             <Link
