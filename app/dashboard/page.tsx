@@ -9,6 +9,7 @@ import {
   getProfile,
   getUserPets,
 } from "@/lib/data/dashboard";
+import { BookingCard } from "@/components/booking-card";
 
 export default async function DashboardPage() {
   const user = await getUser();
@@ -164,37 +165,11 @@ export default async function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {ownerBookings.slice(0, 5).map((booking) => (
-                    <Link
+                    <BookingCard
                       key={booking.id}
-                      href={`/bookings/${booking.id}`}
-                      className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm hover:shadow-md transition-shadow dark:bg-zinc-800"
-                    >
-                      <div>
-                        <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                          Κράτηση #{booking.id.slice(0, 8)}
-                        </p>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                          {new Date(booking.start_date).toLocaleDateString(
-                            "el-GR",
-                          )}{" "}
-                          -{" "}
-                          {new Date(booking.end_date).toLocaleDateString(
-                            "el-GR",
-                          )}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          booking.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                            : booking.status === "accepted"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : "bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200"
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </Link>
+                      booking={booking}
+                      currentUserId={user.id}
+                    />
                   ))}
                 </div>
               )}
@@ -330,49 +305,11 @@ export default async function DashboardPage() {
               ) : (
                 <div className="space-y-4">
                   {caregiverBookings.map((booking) => (
-                    <Link
+                    <BookingCard
                       key={booking.id}
-                      href={`/bookings/${booking.id}`}
-                      className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm hover:shadow-md transition-shadow dark:bg-zinc-800"
-                    >
-                      <div>
-                        <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                          Κράτηση #{booking.id.slice(0, 8)}
-                        </p>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                          {new Date(booking.start_date).toLocaleDateString(
-                            "el-GR",
-                          )}{" "}
-                          -{" "}
-                          {new Date(booking.end_date).toLocaleDateString(
-                            "el-GR",
-                          )}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
-                          booking.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                            : booking.status === "accepted"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : booking.status === "declined"
-                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                : booking.status === "completed"
-                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                                  : "bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200"
-                        }`}
-                      >
-                        {booking.status === "pending"
-                          ? "Εκκρεμεί"
-                          : booking.status === "accepted"
-                            ? "Εγκρίθηκε"
-                            : booking.status === "declined"
-                              ? "Απορρίφθηκε"
-                              : booking.status === "completed"
-                                ? "Ολοκληρώθηκε"
-                                : "Ακυρώθηκε"}
-                      </span>
-                    </Link>
+                      booking={booking}
+                      currentUserId={user.id}
+                    />
                   ))}
                 </div>
               )}

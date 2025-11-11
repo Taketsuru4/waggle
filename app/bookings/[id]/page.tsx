@@ -312,8 +312,25 @@ export default async function BookingDetailPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar - Actions */}
-          <div className="lg:col-span-1">
-            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800 sticky top-8">
+          <div className="lg:col-span-1 space-y-6">
+            {/* Messages */}
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
+                Μηνύματα
+              </h2>
+              <Link
+                href={`/messages/${booking.id}`}
+                className="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
+              >
+                💬 Άνοιγμα Συνομιλίας
+              </Link>
+              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                Επικοινωνήστε με τον {isOwner ? "φροντιστή" : "ιδιοκτήτη"}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-4">
                 Ενέργειες
               </h2>
