@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getUser, signOut } from "./auth/actions";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function Home() {
   const user = await getUser();
@@ -17,7 +16,6 @@ export default async function Home() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <ThemeToggle />
             {user ? (
               <>
                 <span className="text-sm text-zinc-600 dark:text-zinc-400">
