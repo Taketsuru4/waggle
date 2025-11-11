@@ -7,6 +7,18 @@ interface CaregiverCardProps {
 }
 
 export function CaregiverCard({ caregiver }: CaregiverCardProps) {
+  const handleViberClick = (e: React.MouseEvent, number: string) => {
+    e.preventDefault();
+    const cleanNumber = number.replace(/[^0-9]/g, "");
+    // Try to open Viber app first
+    window.location.href = `viber://chat?number=%2B${cleanNumber}`;
+
+    // Fallback to web version after a short delay if app doesn't open
+    setTimeout(() => {
+      window.open(`https://msng.link/vi/${cleanNumber}`, "_blank");
+    }, 1000);
+  };
+
   return (
     <div className="group rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-zinc-800">
       <Link href={`/caregivers/${caregiver.id}`} className="block">
@@ -102,12 +114,13 @@ export function CaregiverCard({ caregiver }: CaregiverCardProps) {
             </a>
           )}
           {caregiver.viber && (
-            <a
-              href={`viber://chat?number=${caregiver.viber.replace(/[^0-9]/g, "")}`}
-              className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-purple-700 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800"
+            <button
+              onClick={(e) => handleViberClick(e, caregiver.viber)}
+              type="button"
+              className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-purple-700 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800 cursor-pointer"
             >
               💜 Viber
-            </a>
+            </button>
           )}
         </div>
       )}

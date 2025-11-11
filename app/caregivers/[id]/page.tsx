@@ -6,6 +6,7 @@ import { getUserPets } from "@/lib/data/dashboard";
 import { createBooking } from "@/app/bookings/actions";
 import { ReviewCard } from "@/components/review-card";
 import { RatingStars } from "@/components/rating-stars";
+import { ContactButtons } from "@/components/contact-buttons";
 
 export default async function CaregiverPage({
   params,
@@ -167,61 +168,11 @@ export default async function CaregiverPage({
             </div>
 
             {/* Contact Info */}
-            {(caregiver.contact_phone ||
-              caregiver.whatsapp ||
-              caregiver.viber) && (
-              <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
-                  Επικοινωνία
-                </h3>
-                <div className="space-y-3">
-                  {caregiver.contact_phone && (
-                    <a
-                      href={`tel:${caregiver.contact_phone}`}
-                      className="flex items-center gap-3 rounded-lg bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:bg-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-600 transition-colors"
-                    >
-                      📞
-                      <div>
-                        <div className="font-semibold">Τηλέφωνο</div>
-                        <div className="text-xs text-zinc-600 dark:text-zinc-400">
-                          {caregiver.contact_phone}
-                        </div>
-                      </div>
-                    </a>
-                  )}
-                  {caregiver.whatsapp && (
-                    <a
-                      href={`https://wa.me/${caregiver.whatsapp.replace(/[^0-9]/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 rounded-lg bg-green-50 px-4 py-3 text-sm font-medium text-green-900 hover:bg-green-100 dark:bg-green-900 dark:text-green-50 dark:hover:bg-green-800 transition-colors"
-                    >
-                      💬
-                      <div>
-                        <div className="font-semibold">WhatsApp</div>
-                        <div className="text-xs text-green-700 dark:text-green-300">
-                          Στείλε μήνυμα
-                        </div>
-                      </div>
-                    </a>
-                  )}
-                  {caregiver.viber && (
-                    <a
-                      href={`viber://chat?number=${caregiver.viber.replace(/[^0-9]/g, "")}`}
-                      className="flex items-center gap-3 rounded-lg bg-purple-50 px-4 py-3 text-sm font-medium text-purple-900 hover:bg-purple-100 dark:bg-purple-900 dark:text-purple-50 dark:hover:bg-purple-800 transition-colors"
-                    >
-                      💜
-                      <div>
-                        <div className="font-semibold">Viber</div>
-                        <div className="text-xs text-purple-700 dark:text-purple-300">
-                          Στείλε μήνυμα
-                        </div>
-                      </div>
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
+            <ContactButtons
+              contactPhone={caregiver.contact_phone}
+              whatsapp={caregiver.whatsapp}
+              viber={caregiver.viber}
+            />
 
             <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
