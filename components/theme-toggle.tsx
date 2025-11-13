@@ -1,9 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "./theme-provider";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div
+        className="rounded-md p-2 w-9 h-9"
+        aria-label="Loading theme toggle"
+      />
+    );
+  }
 
   return (
     <button
@@ -16,7 +31,7 @@ export function ThemeToggle() {
         <svg
           className="h-5 w-5"
           fill="none"
-          viewBox="0 0 24 24"
+          viewBox="0 0 23 24"
           stroke="currentColor"
         >
           <path
