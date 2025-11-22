@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createNotification } from "@/lib/data/notifications";
 
 export async function createBooking(formData: FormData) {
   const supabase = await createClient();
@@ -30,19 +31,34 @@ export async function createBooking(formData: FormData) {
     };
   }
 
-  const { error } = await supabase.from("bookings").insert({
-    owner_id: user.id,
-    caregiver_id: caregiverId,
-    pet_id: petId,
-    start_date: startDate,
-    end_date: endDate,
-    notes: notes || null,
-    status: "pending",
-  });
+  const { data: newBooking, error } = await supabase
+    .from("bookings")
+    .insert({
+      owner_id: user.id,
+      caregiver_id: caregiverId,
+      pet_id: petId,
+      start_date: startDate,
+      end_date: endDate,
+      notes: notes || null,
+      status: "pending",
+    })
+    .select("id, caregiver_profiles!inner(user_id)")
+    .single();
 
   if (error) {
     console.error("Error creating booking:", error);
     return { error: error.message };
+  }
+
+  // Notify caregiver about new booking request
+  if (newBooking && newBooking.caregiver_profiles) {
+    await createNotification({
+      userId: (newBooking.caregiver_profiles as { user_id: string }).user_id,
+      type: "booking_request",
+      title: "Νέο Αίτημα Κράτησης",
+      message: "Έλαβες ένα νέο αίτημα κράτησης από έναν ιδιοκτήτη.",
+      link: `/bookings/${newBooking.id}`,
+    });
   }
 
   revalidatePath("/dashboard");
@@ -74,6 +90,13 @@ export async function acceptBooking(bookingId: string) {
     return { error: "Unauthorized" };
   }
 
+  // Get booking details with owner info
+  const { data: bookingDetails } = await supabase
+    .from("bookings")
+    .select("owner_id")
+    .eq("id", bookingId)
+    .single();
+
   const { error } = await supabase
     .from("bookings")
     .update({ status: "accepted" })
@@ -82,6 +105,17 @@ export async function acceptBooking(bookingId: string) {
   if (error) {
     console.error("Error accepting booking:", error);
     return { error: error.message };
+  }
+
+  // Notify owner that booking was accepted
+  if (bookingDetails) {
+    await createNotification({
+      userId: bookingDetails.owner_id,
+      type: "booking_accepted",
+      title: "Κράτηση Εγκρίθηκε",
+      message: "Ο φροντιστής αποδέχτηκε την κράτησή σου!",
+      link: `/bookings/${bookingId}`,
+    });
   }
 
   revalidatePath("/dashboard");
@@ -113,6 +147,13 @@ export async function declineBooking(bookingId: string) {
     return { error: "Unauthorized" };
   }
 
+  // Get booking details with owner info
+  const { data: bookingDetails } = await supabase
+    .from("bookings")
+    .select("owner_id")
+    .eq("id", bookingId)
+    .single();
+
   const { error } = await supabase
     .from("bookings")
     .update({ status: "declined" })
@@ -121,6 +162,17 @@ export async function declineBooking(bookingId: string) {
   if (error) {
     console.error("Error declining booking:", error);
     return { error: error.message };
+  }
+
+  // Notify owner that booking was declined
+  if (bookingDetails) {
+    await createNotification({
+      userId: bookingDetails.owner_id,
+      type: "booking_declined",
+      title: "Κράτηση Απορρίφθηκε",
+      message: "Ο φροντιστής απέρριψε την κράτησή σου.",
+      link: `/bookings/${bookingId}`,
+    });
   }
 
   revalidatePath("/dashboard");
@@ -137,7 +189,14 @@ export async function cancelBooking(bookingId: string) {
     return { error: "Unauthorized" };
   }
 
-  // Verify user is the owner of this booking
+  // Get booking details with caregiver info
+  const { data: bookingDetails } = await supabase
+    .from("bookings")
+    .select("caregiver_profiles!inner(user_id)")
+    .eq("id", bookingId)
+    .eq("owner_id", user.id)
+    .single();
+
   const { error } = await supabase
     .from("bookings")
     .update({ status: "cancelled" })
@@ -147,6 +206,17 @@ export async function cancelBooking(bookingId: string) {
   if (error) {
     console.error("Error cancelling booking:", error);
     return { error: error.message };
+  }
+
+  // Notify caregiver that booking was cancelled
+  if (bookingDetails && bookingDetails.caregiver_profiles) {
+    await createNotification({
+      userId: (bookingDetails.caregiver_profiles as { user_id: string }).user_id,
+      type: "booking_cancelled",
+      title: "Κράτηση Ακυρώθηκε",
+      message: "Ο ιδιοκτήτης ακύρωσε μια κράτηση.",
+      link: `/bookings/${bookingId}`,
+    });
   }
 
   revalidatePath("/dashboard");
@@ -184,6 +254,13 @@ export async function completeBooking(bookingId: string) {
     return { error: "Unauthorized" };
   }
 
+  // Get booking details with both owner and caregiver info
+  const { data: bookingDetails } = await supabase
+    .from("bookings")
+    .select("owner_id, caregiver_profiles!inner(user_id)")
+    .eq("id", bookingId)
+    .single();
+
   // Update booking status
   const { error } = await supabase
     .from("bookings")
@@ -193,6 +270,29 @@ export async function completeBooking(bookingId: string) {
   if (error) {
     console.error("Error completing booking:", error);
     return { error: error.message };
+  }
+
+  // Notify both parties that booking was completed
+  if (bookingDetails) {
+    const caregiverUserId = (bookingDetails.caregiver_profiles as { user_id: string }).user_id;
+    
+    // Notify owner
+    await createNotification({
+      userId: bookingDetails.owner_id,
+      type: "booking_completed",
+      title: "Κράτηση Ολοκληρώθηκε",
+      message: "Η κράτησή σου ολοκληρώθηκε! Μπορείς να αφήσεις μια αξιολόγηση.",
+      link: `/bookings/${bookingId}`,
+    });
+
+    // Notify caregiver
+    await createNotification({
+      userId: caregiverUserId,
+      type: "booking_completed",
+      title: "Κράτηση Ολοκληρώθηκε",
+      message: "Μια κράτηση ολοκληρώθηκε επιτυχώς!",
+      link: `/bookings/${bookingId}`,
+    });
   }
 
   revalidatePath("/dashboard");
