@@ -8,6 +8,7 @@ import { FAQSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { AnimatedHeroTitle } from "@/components/animated-hero";
 import { UserMenu } from "@/components/user-menu";
+import { NotificationBell } from "@/components/notification-bell";
 import { User, MapPin, Phone } from "lucide-react";
 
 export default async function Home() {
@@ -31,6 +32,7 @@ export default async function Home() {
 
           <div className="flex items-center gap-4">
             <ThemeToggle />
+            {user && <NotificationBell />}
             {user ? (
               <UserMenu
                 avatarUrl={profile?.avatar_url}
