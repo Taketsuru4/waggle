@@ -122,6 +122,7 @@ export function CaregiverCard({
               </div>
             </div>
           </div>
+        </div>
       </Link>
 
       {/* Contact Info */}
