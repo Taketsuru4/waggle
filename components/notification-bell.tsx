@@ -143,21 +143,35 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-800 z-50">
+        <div className="fixed sm:absolute right-0 left-0 sm:left-auto mt-2 sm:w-96 w-screen sm:max-w-md rounded-none sm:rounded-lg border-0 sm:border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-800 z-50 max-h-[80vh] sm:max-h-none">
+          {/* Mobile close button */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="absolute top-3 right-3 sm:hidden rounded-lg p-1.5 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            aria-label="Κλείσιμο"
+          >
+            <X className="h-5 w-5" />
+          </button>
           <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            <h3 className="text-base sm:text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Ειδοποιήσεις
+              {unreadCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
             </h3>
             <Link
               href="/notifications"
-              className="text-xs text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+              className="text-xs sm:text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
               onClick={() => setIsOpen(false)}
             >
-              Δες όλες
+              Δες όλες →
             </Link>
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto overscroll-contain">
             {loading ? (
               <div className="p-8 text-center text-sm text-zinc-600 dark:text-zinc-400">
                 Φόρτωση...
@@ -174,14 +188,14 @@ export function NotificationBell() {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700/50 ${
+                    className={`p-3 sm:p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700/50 ${
                       !notification.read
                         ? "bg-blue-50/50 dark:bg-blue-900/10"
                         : ""
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <span className="text-xl sm:text-2xl flex-shrink-0">
                         {getNotificationIcon(notification.type)}
                       </span>
                       <div className="flex-1 min-w-0">
@@ -197,24 +211,24 @@ export function NotificationBell() {
                               {formatTimeAgo(notification.created_at)}
                             </p>
                           </div>
-                          <div className="flex gap-1">
+                          <div className="flex gap-0.5 sm:gap-1 flex-shrink-0">
                             {!notification.read && (
                               <button
                                 type="button"
                                 onClick={() => handleMarkAsRead(notification.id)}
-                                className="rounded p-1 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
+                                className="rounded p-1 sm:p-1.5 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
                                 title="Μάρκαρε ως διαβασμένο"
                               >
-                                <Check className="h-4 w-4" />
+                                <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                               </button>
                             )}
                             <button
                               type="button"
                               onClick={() => handleDelete(notification.id)}
-                              className="rounded p-1 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
+                              className="rounded p-1 sm:p-1.5 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
                               title="Διαγραφή"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                             </button>
                           </div>
                         </div>
