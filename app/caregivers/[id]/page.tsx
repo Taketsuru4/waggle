@@ -7,6 +7,10 @@ import { createBooking } from "@/app/bookings/actions";
 import { ReviewCard } from "@/components/review-card";
 import { RatingStars } from "@/components/rating-stars";
 import { ContactButtons } from "@/components/contact-buttons";
+import { AvailabilityDisplay } from "@/components/availability-display";
+import { getAvailabilitySlots } from "@/app/availability/actions";
+import { Avatar } from "@/components/avatar";
+import { MapPin, Dog, Cat, Bird, Rabbit, Squirrel } from "lucide-react";
 
 export default async function CaregiverPage({
   params,
@@ -17,6 +21,8 @@ export default async function CaregiverPage({
   const user = await getUser();
   const caregiver = await getCaregiverById(id);
   const userPets = user ? await getUserPets(user.id) : [];
+  const availabilityResult = await getAvailabilitySlots(id);
+  const availableSlots = availabilityResult.data || [];
 
   if (!caregiver) {
     return (
@@ -38,12 +44,21 @@ export default async function CaregiverPage({
           >
             ← Επιστροφή στη λίστα
           </Link>
-          <h1 className="mt-4 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-            {caregiver.profiles?.full_name || "Φροντιστής"}
-          </h1>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-            📍 {caregiver.city}
-          </p>
+          <div className="mt-6 flex items-start gap-6">
+            <Avatar
+              src={caregiver.profiles?.avatar_url}
+              alt={caregiver.profiles?.full_name || "Φροντιστής"}
+              size="xl"
+            />
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                {caregiver.profiles?.full_name || "Φροντιστής"}
+              </h1>
+              <p className="mt-2 text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
+                <MapPin className="h-5 w-5" /> {caregiver.city}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -140,31 +155,39 @@ export default async function CaregiverPage({
               </h3>
               <div className="mt-3 flex flex-wrap gap-2 text-sm">
                 {caregiver.accepts_dogs && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
-                    🐕 Σκύλοι
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700 inline-flex items-center gap-1">
+                    <Dog className="h-4 w-4" /> Σκύλοι
                   </span>
                 )}
                 {caregiver.accepts_cats && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
-                    🐈 Γάτες
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700 inline-flex items-center gap-1">
+                    <Cat className="h-4 w-4" /> Γάτες
                   </span>
                 )}
                 {caregiver.accepts_birds && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
-                    🦜 Πουλιά
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700 inline-flex items-center gap-1">
+                    <Bird className="h-4 w-4" /> Πουλιά
                   </span>
                 )}
                 {caregiver.accepts_rabbits && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
-                    🐰 Κουνέλια
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700 inline-flex items-center gap-1">
+                    <Rabbit className="h-4 w-4" /> Κουνέλια
                   </span>
                 )}
                 {caregiver.accepts_other && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700">
-                    🦎 Άλλα
+                  <span className="rounded-full bg-zinc-100 px-2 py-1 dark:bg-zinc-700 inline-flex items-center gap-1">
+                    <Squirrel className="h-4 w-4" /> Άλλα
                   </span>
                 )}
               </div>
+            </div>
+
+            {/* Availability */}
+            <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
+              <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Διαθεσιμότητα
+              </h3>
+              <AvailabilityDisplay slots={availableSlots} compact={true} />
             </div>
 
             {/* Contact Info */}

@@ -4,6 +4,7 @@ import { getUser } from "@/app/auth/actions";
 import { getBookingDetails } from "@/lib/data/dashboard";
 import { BookingActions } from "../booking-actions";
 import { ReviewSection } from "./review-section";
+import { MessageCircle } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -320,9 +321,9 @@ export default async function BookingDetailPage({ params }: PageProps) {
               </h2>
               <Link
                 href={`/messages/${booking.id}`}
-                className="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-center font-medium"
+                className="flex items-center justify-center gap-2 w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium"
               >
-                💬 Άνοιγμα Συνομιλίας
+                <MessageCircle className="h-4 w-4" /> Άνοιγμα Συνομιλίας
               </Link>
               <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                 Επικοινωνήστε με τον {isOwner ? "φροντιστή" : "ιδιοκτήτη"}

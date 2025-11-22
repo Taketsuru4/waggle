@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/app/auth/actions";
 import { getCaregiverProfile } from "@/lib/data/dashboard";
 import { updateCaregiverProfile } from "../actions";
+import { Dog, Cat, Bird, Rabbit, Squirrel, Phone, MessageCircle, Send } from "lucide-react";
 
 export default async function CaregiverEditPage() {
   const user = await getUser();
@@ -163,8 +164,8 @@ export default async function CaregiverEditPage() {
                   defaultChecked={caregiverProfile.accepts_dogs || false}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700"
                 />
-                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50">
-                  🐕 Σκύλοι
+                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50 flex items-center gap-1">
+                  <Dog className="h-4 w-4" /> Σκύλοι
                 </span>
               </label>
               <label className="flex items-center">
@@ -174,8 +175,8 @@ export default async function CaregiverEditPage() {
                   defaultChecked={caregiverProfile.accepts_cats || false}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700"
                 />
-                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50">
-                  🐈 Γάτες
+                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50 flex items-center gap-1">
+                  <Cat className="h-4 w-4" /> Γάτες
                 </span>
               </label>
               <label className="flex items-center">
@@ -185,8 +186,8 @@ export default async function CaregiverEditPage() {
                   defaultChecked={caregiverProfile.accepts_birds || false}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700"
                 />
-                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50">
-                  🦜 Πουλιά
+                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50 flex items-center gap-1">
+                  <Bird className="h-4 w-4" /> Πουλιά
                 </span>
               </label>
               <label className="flex items-center">
@@ -196,8 +197,8 @@ export default async function CaregiverEditPage() {
                   defaultChecked={caregiverProfile.accepts_rabbits || false}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700"
                 />
-                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50">
-                  🐰 Κουνέλια
+                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50 flex items-center gap-1">
+                  <Rabbit className="h-4 w-4" /> Κουνέλια
                 </span>
               </label>
               <label className="flex items-center">
@@ -207,8 +208,8 @@ export default async function CaregiverEditPage() {
                   defaultChecked={caregiverProfile.accepts_other || false}
                   className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 dark:border-zinc-600 dark:bg-zinc-700"
                 />
-                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50">
-                  🦎 Άλλα
+                <span className="ml-2 text-sm text-zinc-900 dark:text-zinc-50 flex items-center gap-1">
+                  <Squirrel className="h-4 w-4" /> Άλλα
                 </span>
               </label>
             </div>
@@ -251,9 +252,9 @@ export default async function CaregiverEditPage() {
               <div>
                 <label
                   htmlFor="contact_phone"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1"
                 >
-                  📞 Τηλέφωνο Επικοινωνίας
+                  <Phone className="h-4 w-4" /> Τηλέφωνο Επικοινωνίας
                 </label>
                 <input
                   id="contact_phone"
@@ -268,9 +269,9 @@ export default async function CaregiverEditPage() {
               <div>
                 <label
                   htmlFor="whatsapp"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1"
                 >
-                  💬 WhatsApp
+                  <MessageCircle className="h-4 w-4" /> WhatsApp
                 </label>
                 <input
                   id="whatsapp"
@@ -288,9 +289,9 @@ export default async function CaregiverEditPage() {
               <div>
                 <label
                   htmlFor="viber"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1"
                 >
-                  💜 Viber
+                  <Send className="h-4 w-4" /> Viber
                 </label>
                 <input
                   id="viber"

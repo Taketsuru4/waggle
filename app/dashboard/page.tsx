@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "../auth/actions";
+import { Calendar, Settings, BadgeCheck } from "lucide-react";
 import {
   getCaregiverBookings,
   getCaregiverProfile,
@@ -235,53 +236,69 @@ export default async function DashboardPage() {
                     </div>
                   </div>
 
+                  {/* Quick Actions */}
+                  <div className="mb-6 flex gap-4">
+                    <Link
+                      href="/availability"
+                      className="flex-1 rounded-lg border border-zinc-200 bg-white p-4 text-center hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+                    >
+                      <div className="flex justify-center mb-2">
+                        <Calendar className="h-8 w-8 text-zinc-700 dark:text-zinc-300" />
+                      </div>
+                      <span className="mt-2 block text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                        Διαχείριση Διαθεσιμότητας
+                      </span>
+                    </Link>
+                    <Link
+                      href="/dashboard/caregiver/edit"
+                      className="flex-1 rounded-lg border border-zinc-200 bg-white p-4 text-center hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+                    >
+                      <div className="flex justify-center mb-2">
+                        <Settings className="h-8 w-8 text-zinc-700 dark:text-zinc-300" />
+                      </div>
+                      <span className="mt-2 block text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                        Επεξεργασία Προφίλ
+                      </span>
+                    </Link>
+                  </div>
+
                   {/* Profile Info */}
                   <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-800">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                            {caregiverProfile.city}
-                          </h3>
-                          {caregiverProfile.verified && (
-                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                              ✓ Επιβεβαιωμένος
-                            </span>
-                          )}
-                          <span
-                            className={`rounded-full px-2 py-1 text-xs font-medium ${
-                              caregiverProfile.available
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                : "bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200"
-                            }`}
-                          >
-                            {caregiverProfile.available
-                              ? "Διαθέσιμος"
-                              : "Μη Διαθέσιμος"}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                          {caregiverProfile.bio || "Δεν έχεις προσθέσει bio"}
-                        </p>
-                        <div className="mt-4 flex gap-4 text-sm">
-                          {caregiverProfile.experience_years && (
-                            <span className="text-zinc-600 dark:text-zinc-400">
-                              Εμπειρία: {caregiverProfile.experience_years} έτη
-                            </span>
-                          )}
-                          {caregiverProfile.hourly_rate && (
-                            <span className="text-zinc-600 dark:text-zinc-400">
-                              {caregiverProfile.hourly_rate}€/ώρα
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <Link
-                        href="/dashboard/caregiver/edit"
-                        className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                        {caregiverProfile.city}
+                      </h3>
+                      {caregiverProfile.verified && (
+                        <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200 inline-flex items-center gap-1">
+                          <BadgeCheck className="h-3 w-3" /> Επιβεβαιωμένος
+                        </span>
+                      )}
+                      <span
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
+                          caregiverProfile.available
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-zinc-100 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200"
+                        }`}
                       >
-                        Επεξεργασία →
-                      </Link>
+                        {caregiverProfile.available
+                          ? "Διαθέσιμος"
+                          : "Μη Διαθέσιμος"}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                      {caregiverProfile.bio || "Δεν έχεις προσθέσει bio"}
+                    </p>
+                    <div className="mt-4 flex gap-4 text-sm">
+                      {caregiverProfile.experience_years && (
+                        <span className="text-zinc-600 dark:text-zinc-400">
+                          Εμπειρία: {caregiverProfile.experience_years} έτη
+                        </span>
+                      )}
+                      {caregiverProfile.hourly_rate && (
+                        <span className="text-zinc-600 dark:text-zinc-400">
+                          {caregiverProfile.hourly_rate}€/ώρα
+                        </span>
+                      )}
                     </div>
                   </div>
                 </>

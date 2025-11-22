@@ -1,5 +1,7 @@
 "use client";
 
+import { Phone, MessageCircle, Send } from "lucide-react";
+
 interface ContactButtonsProps {
   contactPhone?: string | null;
   whatsapp?: string | null;
@@ -37,7 +39,7 @@ export function ContactButtons({
             href={`tel:${contactPhone}`}
             className="flex items-center gap-3 rounded-lg bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-900 hover:bg-zinc-100 dark:bg-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-600 transition-colors"
           >
-            📞
+            <Phone className="h-5 w-5" />
             <div>
               <div className="font-semibold">Τηλέφωνο</div>
               <div className="text-xs text-zinc-600 dark:text-zinc-400">
@@ -53,7 +55,7 @@ export function ContactButtons({
             rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-lg bg-green-50 px-4 py-3 text-sm font-medium text-green-900 hover:bg-green-100 dark:bg-green-900 dark:text-green-50 dark:hover:bg-green-800 transition-colors"
           >
-            💬
+            <MessageCircle className="h-5 w-5" />
             <div>
               <div className="font-semibold">WhatsApp</div>
               <div className="text-xs text-green-700 dark:text-green-300">
@@ -68,7 +70,7 @@ export function ContactButtons({
             type="button"
             className="w-full flex items-center gap-3 rounded-lg bg-purple-50 px-4 py-3 text-sm font-medium text-purple-900 hover:bg-purple-100 dark:bg-purple-900 dark:text-purple-50 dark:hover:bg-purple-800 transition-colors cursor-pointer"
           >
-            💜
+            <Send className="h-5 w-5" />
             <div>
               <div className="font-semibold">Viber</div>
               <div className="text-xs text-purple-700 dark:text-purple-300">
