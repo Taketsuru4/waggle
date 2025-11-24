@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
+import { signOut } from "@/app/auth/actions";
 
 interface NavbarProps {
   user?: {
@@ -19,6 +21,7 @@ interface NavbarProps {
 
 export function Navbar({ user, profile }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
@@ -149,14 +152,16 @@ export function Navbar({ user, profile }: NavbarProps) {
                   Προφίλ
                 </Link>
                 <div className="border-t border-zinc-200 pt-2 dark:border-zinc-800">
-                  <form action="/auth/signout" method="post">
-                    <button
-                      type="submit"
-                      className="block w-full rounded-lg px-3 py-2 text-left text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10"
-                    >
-                      Αποσύνδεση
-                    </button>
-                  </form>
+                  <button
+                    onClick={async () => {
+                      await signOut();
+                      router.push("/auth/login");
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-base font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10"
+                  >
+                    Αποσύνδεση
+                  </button>
                 </div>
               </>
             ) : (

@@ -215,7 +215,9 @@ export function NotificationBell() {
                             {!notification.read && (
                               <button
                                 type="button"
-                                onClick={() => handleMarkAsRead(notification.id)}
+                                onClick={() =>
+                                  handleMarkAsRead(notification.id)
+                                }
                                 className="rounded p-1 sm:p-1.5 text-zinc-600 hover:bg-zinc-200 dark:text-zinc-400 dark:hover:bg-zinc-600"
                                 title="Μάρκαρε ως διαβασμένο"
                               >

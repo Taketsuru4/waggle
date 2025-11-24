@@ -9,7 +9,8 @@ export async function getAllCaregivers() {
 			*,
 			profiles:user_id (
 				full_name,
-				email
+				email,
+				avatar_url
 			)
 		`)
     .eq("available", true)
@@ -94,7 +95,8 @@ export async function searchCaregivers(filters: {
 			*,
 			profiles:user_id (
 				full_name,
-				email
+				email,
+				avatar_url
 			)
 		`);
 

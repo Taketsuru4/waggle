@@ -113,6 +113,130 @@ export async function getUnreadCount(bookingId: string): Promise<number> {
 }
 
 /**
+ * Get all conversations (bookings with messages) for current user
+ */
+export async function getConversations() {
+  try {
+    const supabase = await createClient();
+
+    // Get current user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return [];
+    }
+
+    // Get bookings where user is owner
+    const { data: ownerBookings } = await supabase
+      .from("bookings")
+      .select(
+        `
+        id,
+        caregiver_profiles!inner(
+          user_id,
+          profiles!inner(
+            full_name
+          )
+        )
+      `,
+      )
+      .eq("owner_id", user.id);
+
+    // Get bookings where user is caregiver
+    const { data: caregiverBookings } = await supabase
+      .from("bookings")
+      .select(
+        `
+        id,
+        owner_id,
+        profiles!bookings_owner_id_fkey(
+          full_name
+        )
+      `,
+      )
+      .eq("caregiver_profiles.user_id", user.id);
+
+    // Combine and get latest message + unread count for each
+    const conversations = [];
+
+    // Process owner bookings
+    if (ownerBookings) {
+      for (const booking of ownerBookings) {
+        const { data: lastMessage } = await supabase
+          .from("messages")
+          .select("content, created_at, sender_id")
+          .eq("booking_id", booking.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        const { count: unreadCount } = await supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+          .eq("booking_id", booking.id)
+          .eq("read", false)
+          .neq("sender_id", user.id);
+
+        conversations.push({
+          booking_id: booking.id,
+          other_party_name:
+            (booking.caregiver_profiles as any)?.profiles?.full_name ||
+            "Φροντιστής",
+          last_message: lastMessage,
+          unread_count: unreadCount || 0,
+        });
+      }
+    }
+
+    // Process caregiver bookings
+    if (caregiverBookings) {
+      for (const booking of caregiverBookings) {
+        const { data: lastMessage } = await supabase
+          .from("messages")
+          .select("content, created_at, sender_id")
+          .eq("booking_id", booking.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        const { count: unreadCount } = await supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+          .eq("booking_id", booking.id)
+          .eq("read", false)
+          .neq("sender_id", user.id);
+
+        conversations.push({
+          booking_id: booking.id,
+          other_party_name:
+            (booking.profiles as any)?.full_name || "Ιδιοκτήτης",
+          last_message: lastMessage,
+          unread_count: unreadCount || 0,
+        });
+      }
+    }
+
+    // Sort by last message date
+    conversations.sort((a, b) => {
+      if (!a.last_message) return 1;
+      if (!b.last_message) return -1;
+      return (
+        new Date(b.last_message.created_at).getTime() -
+        new Date(a.last_message.created_at).getTime()
+      );
+    });
+
+    return conversations;
+  } catch (error) {
+    console.error("Error in getConversations:", error);
+    return [];
+  }
+}
+
+/**
  * Get total unread message count across all bookings for current user
  */
 export async function getTotalUnreadCount(): Promise<number> {

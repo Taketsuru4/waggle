@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { Avatar } from "@/components/avatar";
-import { Dog, Cat, Bird, Rabbit, Squirrel, MapPin, Phone, MessageCircle, Calendar, BadgeCheck } from "lucide-react";
+import {
+  Dog,
+  Cat,
+  Bird,
+  Rabbit,
+  Squirrel,
+  MapPin,
+  Phone,
+  MessageCircle,
+  Calendar,
+  BadgeCheck,
+} from "lucide-react";
 
 interface CaregiverCardProps {
   caregiver: any;
@@ -52,7 +63,7 @@ export function CaregiverCard({
               )}
             </div>
           </div>
-          
+
           <div className="flex-1 w-full">
             {/* Desktop: Show title/location here */}
             <div className="hidden sm:block mb-2">
@@ -152,7 +163,8 @@ export function CaregiverCard({
               type="button"
               className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-1 text-purple-700 hover:bg-purple-200 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800 cursor-pointer"
             >
-             <img src="../assets/viber-icon.avif"height={12}width={12}></img> Viber
+              <img src="../assets/viber-icon.avif" height={12} width={12}></img>{" "}
+              Viber
             </button>
           )}
         </div>

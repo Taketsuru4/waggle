@@ -2,6 +2,7 @@
 
 import { Avatar } from "./avatar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { signOut } from "@/app/auth/actions";
 
@@ -14,6 +15,7 @@ interface UserMenuProps {
 export function UserMenu({ avatarUrl, fullName, email }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -57,14 +59,15 @@ export function UserMenu({ avatarUrl, fullName, email }: UserMenuProps) {
               Dashboard
             </Link>
             <hr className="my-2 border-zinc-200 dark:border-zinc-700" />
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-              >
-                Αποσύνδεση
-              </button>
-            </form>
+            <button
+              onClick={async () => {
+                await signOut();
+                router.push("/auth/login");
+              }}
+              className="w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+            >
+              Αποσύνδεση
+            </button>
           </div>
         </div>
       )}

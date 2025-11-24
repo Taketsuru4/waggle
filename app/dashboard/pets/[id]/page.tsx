@@ -28,7 +28,7 @@ export default async function EditPetPage({
     notFound();
   }
 
-  const updatePetWithId = updatePet.bind(null, pet.id);
+  const updatePetWithId = updatePet.bind(null, pet.id) as (formData: FormData) => void;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">

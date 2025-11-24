@@ -31,7 +31,7 @@ export default async function NewPetPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-8">
         <form
-          action={createPet}
+          action={createPet as (formData: FormData) => void}
           className="space-y-6 rounded-lg bg-white p-8 shadow-sm dark:bg-zinc-800"
         >
           {/* Basic Info */}

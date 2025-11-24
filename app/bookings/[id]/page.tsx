@@ -69,6 +69,34 @@ export default async function BookingDetailPage({ params }: PageProps) {
   const userRole = isOwner ? "owner" : "caregiver";
   const otherParty = isOwner ? booking.caregiver : booking.owner;
 
+  // Helper to get display name based on party type
+  const getDisplayName = () => {
+    if (isOwner) {
+      return (
+        booking.caregiver.profile.full_name ||
+        booking.caregiver.profile.email ||
+        "Φροντιστής"
+      );
+    }
+    return booking.owner.full_name || booking.owner.email || "Ιδιοκτήτης";
+  };
+
+  // Helper to get email
+  const getEmail = () => {
+    if (isOwner) {
+      return booking.caregiver.profile.email;
+    }
+    return booking.owner.email;
+  };
+
+  // Helper to get phone
+  const getPhone = () => {
+    if (isOwner) {
+      return booking.caregiver.profile.phone;
+    }
+    return booking.owner.phone;
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Header */}
@@ -241,13 +269,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
             <ReviewSection
               bookingId={booking.id}
               bookingStatus={booking.status}
-              caregiverName={
-                isOwner
-                  ? otherParty.profile?.full_name ||
-                    otherParty.profile?.email ||
-                    "Φροντιστής"
-                  : ""
-              }
+              caregiverName={isOwner ? getDisplayName() : ""}
               isOwner={isOwner}
             />
 
@@ -260,13 +282,11 @@ export default async function BookingDetailPage({ params }: PageProps) {
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                    {isOwner
-                      ? otherParty.profile.full_name || otherParty.profile.email
-                      : otherParty.full_name || otherParty.email}
+                    {getDisplayName()}
                   </h3>
-                  {isOwner && "city" in otherParty && otherParty.city && (
+                  {isOwner && booking.caregiver.city && (
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {otherParty.city}
+                      {booking.caregiver.city}
                     </p>
                   )}
                 </div>
@@ -276,35 +296,28 @@ export default async function BookingDetailPage({ params }: PageProps) {
                     Email
                   </p>
                   <p className="mt-1 text-zinc-900 dark:text-zinc-50">
-                    {isOwner ? otherParty.profile.email : otherParty.email}
+                    {getEmail()}
                   </p>
                 </div>
 
-                {((isOwner &&
-                  "profile" in otherParty &&
-                  otherParty.profile.phone) ||
-                  (!isOwner && "phone" in otherParty && otherParty.phone)) && (
+                {getPhone() && (
                   <div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">
                       Τηλέφωνο
                     </p>
                     <p className="mt-1 text-zinc-900 dark:text-zinc-50">
-                      {isOwner && "profile" in otherParty
-                        ? otherParty.profile.phone
-                        : "phone" in otherParty
-                          ? otherParty.phone
-                          : null}
+                      {getPhone()}
                     </p>
                   </div>
                 )}
 
-                {isOwner && "bio" in otherParty && otherParty.bio && (
+                {isOwner && booking.caregiver.bio && (
                   <div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">
                       Bio
                     </p>
                     <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
-                      {otherParty.bio}
+                      {booking.caregiver.bio}
                     </p>
                   </div>
                 )}

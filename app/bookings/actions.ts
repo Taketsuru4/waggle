@@ -52,8 +52,11 @@ export async function createBooking(formData: FormData) {
 
   // Notify caregiver about new booking request
   if (newBooking && newBooking.caregiver_profiles) {
+    const caregiverProfile = Array.isArray(newBooking.caregiver_profiles)
+      ? newBooking.caregiver_profiles[0]
+      : newBooking.caregiver_profiles;
     await createNotification({
-      userId: (newBooking.caregiver_profiles as { user_id: string }).user_id,
+      userId: (caregiverProfile as { user_id: string }).user_id,
       type: "booking_request",
       title: "Νέο Αίτημα Κράτησης",
       message: "Έλαβες ένα νέο αίτημα κράτησης από έναν ιδιοκτήτη.",
@@ -82,11 +85,14 @@ export async function acceptBooking(bookingId: string) {
     .eq("id", bookingId)
     .single();
 
-  if (
-    !booking ||
-    !booking.caregiver_profiles ||
-    (booking.caregiver_profiles as { user_id: string }).user_id !== user.id
-  ) {
+  const caregiverProfile =
+    booking && booking.caregiver_profiles
+      ? ((Array.isArray(booking.caregiver_profiles)
+          ? booking.caregiver_profiles[0]
+          : booking.caregiver_profiles) as { user_id: string })
+      : null;
+
+  if (!booking || !caregiverProfile || caregiverProfile.user_id !== user.id) {
     return { error: "Unauthorized" };
   }
 
@@ -139,11 +145,14 @@ export async function declineBooking(bookingId: string) {
     .eq("id", bookingId)
     .single();
 
-  if (
-    !booking ||
-    !booking.caregiver_profiles ||
-    (booking.caregiver_profiles as { user_id: string }).user_id !== user.id
-  ) {
+  const caregiverProfile =
+    booking && booking.caregiver_profiles
+      ? ((Array.isArray(booking.caregiver_profiles)
+          ? booking.caregiver_profiles[0]
+          : booking.caregiver_profiles) as { user_id: string })
+      : null;
+
+  if (!booking || !caregiverProfile || caregiverProfile.user_id !== user.id) {
     return { error: "Unauthorized" };
   }
 
@@ -210,8 +219,11 @@ export async function cancelBooking(bookingId: string) {
 
   // Notify caregiver that booking was cancelled
   if (bookingDetails && bookingDetails.caregiver_profiles) {
+    const caregiverProfile = Array.isArray(bookingDetails.caregiver_profiles)
+      ? bookingDetails.caregiver_profiles[0]
+      : bookingDetails.caregiver_profiles;
     await createNotification({
-      userId: (bookingDetails.caregiver_profiles as { user_id: string }).user_id,
+      userId: (caregiverProfile as { user_id: string }).user_id,
       type: "booking_cancelled",
       title: "Κράτηση Ακυρώθηκε",
       message: "Ο ιδιοκτήτης ακύρωσε μια κράτηση.",
@@ -273,9 +285,12 @@ export async function completeBooking(bookingId: string) {
   }
 
   // Notify both parties that booking was completed
-  if (bookingDetails) {
-    const caregiverUserId = (bookingDetails.caregiver_profiles as { user_id: string }).user_id;
-    
+  if (bookingDetails && bookingDetails.caregiver_profiles) {
+    const caregiverProfile = Array.isArray(bookingDetails.caregiver_profiles)
+      ? bookingDetails.caregiver_profiles[0]
+      : bookingDetails.caregiver_profiles;
+    const caregiverUserId = (caregiverProfile as { user_id: string }).user_id;
+
     // Notify owner
     await createNotification({
       userId: bookingDetails.owner_id,

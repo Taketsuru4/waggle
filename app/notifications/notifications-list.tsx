@@ -118,9 +118,7 @@ export function NotificationsList() {
   };
 
   const filteredNotifications =
-    filter === "unread"
-      ? notifications.filter((n) => !n.read)
-      : notifications;
+    filter === "unread" ? notifications.filter((n) => !n.read) : notifications;
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
