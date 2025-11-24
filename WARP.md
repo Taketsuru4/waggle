@@ -44,10 +44,27 @@ npm run format  # Format code with Biome
 Copy `.env.local.example` to `.env.local` and configure:
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `NEXT_PUBLIC_SITE_URL` (Optional) - Site URL for OAuth redirects (defaults to http://localhost:3000)
 
 These are obtained from the Supabase dashboard.
 
 ## Architecture
+
+### Authentication
+
+The app supports three authentication methods:
+- **Email/Password**: Traditional authentication via Supabase
+- **Google OAuth**: Sign in with Google account
+- **Apple OAuth**: Sign in with Apple ID
+
+**OAuth Setup**: To enable OAuth providers, follow the guide in `docs/oauth-setup.md`. This includes configuring Google Cloud Console and Apple Developer accounts, then enabling the providers in Supabase dashboard.
+
+**OAuth Flow**:
+1. User clicks OAuth button (login or signup page)
+2. Server action redirects to OAuth provider
+3. After authentication, callback route (`app/auth/callback/route.ts`) handles the response
+4. Profile is automatically created for new OAuth users with default role "owner"
+5. User is redirected to homepage
 
 ### Supabase Client Pattern
 
@@ -105,9 +122,16 @@ Biome is configured with:
 ```
 waggle/
 ├── app/              # Next.js App Router
+│   ├── auth/         # Authentication
+│   │   ├── login/    # Login page & form
+│   │   ├── signup/   # Signup page & form
+│   │   ├── callback/ # OAuth callback handler
+│   │   └── actions.ts # Auth server actions
 │   ├── layout.tsx    # Root layout with fonts
 │   ├── page.tsx      # Homepage
 │   └── globals.css   # Global styles
+├── docs/             # Documentation
+│   └── oauth-setup.md # OAuth configuration guide
 ├── lib/              # Shared utilities
 │   └── supabase/     # Supabase client utilities
 │       ├── client.ts # Browser client
