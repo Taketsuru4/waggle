@@ -86,6 +86,9 @@ describe("Caregiver Profile", () => {
         accepts_rabbits: false,
         accepts_other: false,
         available: true,
+        contact_phone: null,
+        whatsapp: null,
+        viber: null,
       });
     });
 
@@ -330,6 +333,9 @@ describe("Caregiver Profile", () => {
         accepts_rabbits: false,
         accepts_other: false,
         available: true,
+        contact_phone: null,
+        whatsapp: null,
+        viber: null,
       });
     });
 

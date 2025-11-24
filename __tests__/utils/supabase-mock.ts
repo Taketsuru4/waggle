@@ -14,21 +14,28 @@ export const createMockSupabaseClient = () => {
   const mockOrder = vi.fn();
   const mockSingle = vi.fn();
 
-  // Chain methods
-  const createChain = (finalResult: any) => {
-    const chain = {
-      select: mockSelect.mockReturnValue(chain),
-      insert: mockInsert.mockReturnValue(chain),
-      update: mockUpdate.mockReturnValue(chain),
-      delete: mockDelete.mockReturnValue(chain),
-      eq: mockEq.mockReturnValue(chain),
-      ilike: mockIlike.mockReturnValue(chain),
-      or: mockOr.mockReturnValue(chain),
-      gte: mockGte.mockReturnValue(chain),
-      lte: mockLte.mockReturnValue(chain),
-      order: mockOrder.mockReturnValue(finalResult),
-      single: mockSingle.mockReturnValue(finalResult),
+  // Chain methods - create a recursive chain that always returns itself
+  const createChain = (finalResult: any = { data: null, error: null }): any => {
+    const chain: any = {
+      select: vi.fn((columns?: string) => chain),
+      insert: vi.fn((values: any) => chain),
+      update: vi.fn((values: any) => chain),
+      delete: vi.fn(() => chain),
+      eq: vi.fn((column: string, value: any) => chain),
+      ilike: vi.fn((column: string, pattern: string) => chain),
+      or: vi.fn((filters: string) => chain),
+      gte: vi.fn((column: string, value: any) => chain),
+      lte: vi.fn((column: string, value: any) => chain),
+      order: vi.fn((column: string, options?: any) => chain),
+      single: vi.fn(() => Promise.resolve(finalResult)),
+      then: (resolve: any) => Promise.resolve(finalResult).then(resolve),
+      catch: (reject: any) => Promise.resolve(finalResult).catch(reject),
     };
+    
+    // Make the chain thenable so it can be awaited directly
+    chain.data = finalResult.data;
+    chain.error = finalResult.error;
+    
     return chain;
   };
 
