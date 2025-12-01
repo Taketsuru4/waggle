@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendWelcomeEmail } from "@/lib/email/send";
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
@@ -41,6 +42,16 @@ export async function signUp(formData: FormData) {
       .from("profiles")
       .update({ role })
       .eq("id", signUpData.user.id);
+  }
+
+  // Send welcome email (don't block on failure)
+  if (signUpData?.user) {
+    sendWelcomeEmail({
+      userName: signUpData.user.user_metadata.full_name || "φίλε",
+      userEmail: signUpData.user.email || "",
+    }).catch((error) => {
+      console.error("Failed to send welcome email:", error);
+    });
   }
 
   revalidatePath("/", "layout");

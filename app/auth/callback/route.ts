@@ -17,8 +17,14 @@ export async function GET(request: Request) {
 
   // Check for OAuth errors from provider
   if (error_param) {
-    console.error("[OAuth Callback] Provider error:", error_param, error_description);
-    return NextResponse.redirect(`${origin}/auth/login?error=${encodeURIComponent(error_description || error_param)}`);
+    console.error(
+      "[OAuth Callback] Provider error:",
+      error_param,
+      error_description,
+    );
+    return NextResponse.redirect(
+      `${origin}/auth/login?error=${encodeURIComponent(error_description || error_param)}`,
+    );
   }
 
   if (code) {
@@ -34,7 +40,9 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("[OAuth Callback] Exchange error:", error);
-      return NextResponse.redirect(`${origin}/auth/login?error=${encodeURIComponent(error.message)}`);
+      return NextResponse.redirect(
+        `${origin}/auth/login?error=${encodeURIComponent(error.message)}`,
+      );
     }
 
     if (data.user) {

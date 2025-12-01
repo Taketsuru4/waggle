@@ -31,11 +31,11 @@ export const createMockSupabaseClient = () => {
       then: (resolve: any) => Promise.resolve(finalResult).then(resolve),
       catch: (reject: any) => Promise.resolve(finalResult).catch(reject),
     };
-    
+
     // Make the chain thenable so it can be awaited directly
     chain.data = finalResult.data;
     chain.error = finalResult.error;
-    
+
     return chain;
   };
 

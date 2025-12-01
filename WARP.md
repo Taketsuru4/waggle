@@ -45,8 +45,12 @@ Copy `.env.local.example` to `.env.local` and configure:
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 - `NEXT_PUBLIC_SITE_URL` (Optional) - Site URL for OAuth redirects (defaults to http://localhost:3000)
+- `RESEND_API_KEY` - Resend API key for email notifications (get from resend.com)
 
-These are obtained from the Supabase dashboard.
+Supabase credentials are obtained from the Supabase dashboard.
+Resend API key is obtained from [resend.com/api-keys](https://resend.com/api-keys).
+
+**See `EMAIL_SETUP.md` for detailed email notification setup instructions.**
 
 ## Architecture
 
@@ -133,6 +137,11 @@ waggle/
 ├── docs/             # Documentation
 │   └── oauth-setup.md # OAuth configuration guide
 ├── lib/              # Shared utilities
+│   ├── email/        # Email notification system
+│   │   ├── client.ts # Resend client
+│   │   ├── types.ts  # Email interfaces
+│   │   ├── send.ts   # Send functions
+│   │   └── templates/ # React email templates
 │   └── supabase/     # Supabase client utilities
 │       ├── client.ts # Browser client
 │       └── server.ts # Server client

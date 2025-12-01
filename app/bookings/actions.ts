@@ -4,6 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createNotification } from "@/lib/data/notifications";
+import {
+  sendBookingRequestEmail,
+  sendBookingAcceptedEmail,
+  sendBookingDeclinedEmail,
+  sendBookingCancelledEmail,
+  sendBookingCompletedEmail,
+} from "@/lib/email/send";
+import { format } from "date-fns";
+import { el } from "date-fns/locale";
 
 export async function createBooking(formData: FormData) {
   const supabase = await createClient();
@@ -55,13 +64,77 @@ export async function createBooking(formData: FormData) {
     const caregiverProfile = Array.isArray(newBooking.caregiver_profiles)
       ? newBooking.caregiver_profiles[0]
       : newBooking.caregiver_profiles;
+    const caregiverUserId = (caregiverProfile as { user_id: string }).user_id;
+
     await createNotification({
-      userId: (caregiverProfile as { user_id: string }).user_id,
+      userId: caregiverUserId,
       type: "booking_request",
       title: "Νέο Αίτημα Κράτησης",
       message: "Έλαβες ένα νέο αίτημα κράτησης από έναν ιδιοκτήτη.",
       link: `/bookings/${newBooking.id}`,
     });
+
+    // Send email notification
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        start_date,
+        end_date,
+        pets(name),
+        profiles!bookings_owner_id_fkey(full_name, email),
+        caregiver_profiles!inner(
+          profiles(full_name, email)
+        )
+      `)
+      .eq("id", newBooking.id)
+      .single();
+
+    if (bookingData) {
+      const ownerProfiles = bookingData.profiles;
+      const ownerProfile = (Array.isArray(ownerProfiles)
+        ? ownerProfiles[0]
+        : ownerProfiles) as { full_name: string; email: string } | null;
+      const caregiverProfiles = bookingData.caregiver_profiles;
+      const caregiverProfileData = Array.isArray(caregiverProfiles)
+        ? caregiverProfiles[0]
+        : caregiverProfiles;
+      // Type assertion for nested profiles structure
+      const caregiverProfile =
+        caregiverProfileData as unknown as {
+          profiles:
+            | { email: string; full_name: string }
+            | { email: string; full_name: string }[];
+        } | null;
+      const caregiverProfilesNested = caregiverProfile?.profiles;
+      const caregiverProfileInner = Array.isArray(caregiverProfilesNested)
+        ? caregiverProfilesNested[0]
+        : caregiverProfilesNested;
+      const caregiverEmail = caregiverProfileInner?.email || null;
+      const caregiverName = caregiverProfileInner?.full_name || null;
+      const petsData = bookingData.pets;
+      const petData = (Array.isArray(petsData) ? petsData[0] : petsData) as
+        | { name: string }
+        | null;
+
+      if (caregiverEmail && ownerProfile && petData) {
+        sendBookingRequestEmail(caregiverEmail, {
+          ownerName: ownerProfile.full_name || "Ιδιοκτήτης",
+          caregiverName: caregiverName || "Caregiver",
+          petName: petData.name,
+          startDate: format(new Date(bookingData.start_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          endDate: format(new Date(bookingData.end_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          bookingId: bookingData.id,
+          bookingUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/bookings/${bookingData.id}`,
+        }).catch((error) => {
+          console.error("Failed to send booking request email:", error);
+        });
+      }
+    }
   }
 
   revalidatePath("/dashboard");
@@ -122,6 +195,64 @@ export async function acceptBooking(bookingId: string) {
       message: "Ο φροντιστής αποδέχτηκε την κράτησή σου!",
       link: `/bookings/${bookingId}`,
     });
+
+    // Send email notification
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        start_date,
+        end_date,
+        pets(name),
+        profiles!bookings_owner_id_fkey(full_name, email),
+        caregiver_profiles!inner(
+          profiles(full_name)
+        )
+      `)
+      .eq("id", bookingId)
+      .single();
+
+    if (bookingData) {
+      const ownerProfiles = bookingData.profiles;
+      const ownerProfile = (Array.isArray(ownerProfiles)
+        ? ownerProfiles[0]
+        : ownerProfiles) as { full_name: string; email: string } | null;
+      const caregiverProfiles = bookingData.caregiver_profiles;
+      const caregiverProfileData = Array.isArray(caregiverProfiles)
+        ? caregiverProfiles[0]
+        : caregiverProfiles;
+      const caregiverProfile =
+        caregiverProfileData as unknown as {
+          profiles: { full_name: string } | { full_name: string }[];
+        } | null;
+      const caregiverProfilesNested = caregiverProfile?.profiles;
+      const caregiverProfileInner = Array.isArray(caregiverProfilesNested)
+        ? caregiverProfilesNested[0]
+        : caregiverProfilesNested;
+      const caregiverName = caregiverProfileInner?.full_name || null;
+      const petsData = bookingData.pets;
+      const petData = (Array.isArray(petsData) ? petsData[0] : petsData) as
+        | { name: string }
+        | null;
+
+      if (ownerProfile?.email && petData) {
+        sendBookingAcceptedEmail(ownerProfile.email, {
+          ownerName: ownerProfile.full_name || "Ιδιοκτήτης",
+          caregiverName: caregiverName || "Caregiver",
+          petName: petData.name,
+          startDate: format(new Date(bookingData.start_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          endDate: format(new Date(bookingData.end_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          bookingId: bookingData.id,
+          bookingUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/bookings/${bookingData.id}`,
+        }).catch((error) => {
+          console.error("Failed to send booking accepted email:", error);
+        });
+      }
+    }
   }
 
   revalidatePath("/dashboard");
@@ -182,6 +313,64 @@ export async function declineBooking(bookingId: string) {
       message: "Ο φροντιστής απέρριψε την κράτησή σου.",
       link: `/bookings/${bookingId}`,
     });
+
+    // Send email notification
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        start_date,
+        end_date,
+        pets(name),
+        profiles!bookings_owner_id_fkey(full_name, email),
+        caregiver_profiles!inner(
+          profiles(full_name)
+        )
+      `)
+      .eq("id", bookingId)
+      .single();
+
+    if (bookingData) {
+      const ownerProfiles = bookingData.profiles;
+      const ownerProfile = (Array.isArray(ownerProfiles)
+        ? ownerProfiles[0]
+        : ownerProfiles) as { full_name: string; email: string } | null;
+      const caregiverProfiles = bookingData.caregiver_profiles;
+      const caregiverProfileData = Array.isArray(caregiverProfiles)
+        ? caregiverProfiles[0]
+        : caregiverProfiles;
+      const caregiverProfile =
+        caregiverProfileData as unknown as {
+          profiles: { full_name: string } | { full_name: string }[];
+        } | null;
+      const caregiverProfilesNested = caregiverProfile?.profiles;
+      const caregiverProfileInner = Array.isArray(caregiverProfilesNested)
+        ? caregiverProfilesNested[0]
+        : caregiverProfilesNested;
+      const caregiverName = caregiverProfileInner?.full_name || null;
+      const petsData = bookingData.pets;
+      const petData = (Array.isArray(petsData) ? petsData[0] : petsData) as
+        | { name: string }
+        | null;
+
+      if (ownerProfile?.email && petData) {
+        sendBookingDeclinedEmail(ownerProfile.email, {
+          ownerName: ownerProfile.full_name || "Ιδιοκτήτης",
+          caregiverName: caregiverName || "Caregiver",
+          petName: petData.name,
+          startDate: format(new Date(bookingData.start_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          endDate: format(new Date(bookingData.end_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          bookingId: bookingData.id,
+          bookingUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/bookings/${bookingData.id}`,
+        }).catch((error) => {
+          console.error("Failed to send booking declined email:", error);
+        });
+      }
+    }
   }
 
   revalidatePath("/dashboard");
@@ -229,6 +418,67 @@ export async function cancelBooking(bookingId: string) {
       message: "Ο ιδιοκτήτης ακύρωσε μια κράτηση.",
       link: `/bookings/${bookingId}`,
     });
+
+    // Send email notification
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        start_date,
+        end_date,
+        pets(name),
+        profiles!bookings_owner_id_fkey(full_name),
+        caregiver_profiles!inner(
+          profiles(full_name, email)
+        )
+      `)
+      .eq("id", bookingId)
+      .single();
+
+    if (bookingData) {
+      const ownerProfiles = bookingData.profiles;
+      const ownerProfile = (Array.isArray(ownerProfiles)
+        ? ownerProfiles[0]
+        : ownerProfiles) as { full_name: string } | null;
+      const caregiverProfiles = bookingData.caregiver_profiles;
+      const caregiverProfileData = Array.isArray(caregiverProfiles)
+        ? caregiverProfiles[0]
+        : caregiverProfiles;
+      const caregiverProfile =
+        caregiverProfileData as unknown as {
+          profiles:
+            | { email: string; full_name: string }
+            | { email: string; full_name: string }[];
+        } | null;
+      const caregiverProfilesNested = caregiverProfile?.profiles;
+      const caregiverProfileInner = Array.isArray(caregiverProfilesNested)
+        ? caregiverProfilesNested[0]
+        : caregiverProfilesNested;
+      const caregiverEmail = caregiverProfileInner?.email || null;
+      const caregiverName = caregiverProfileInner?.full_name || null;
+      const petsData = bookingData.pets;
+      const petData = (Array.isArray(petsData) ? petsData[0] : petsData) as
+        | { name: string }
+        | null;
+
+      if (caregiverEmail && petData) {
+        sendBookingCancelledEmail(caregiverEmail, {
+          ownerName: ownerProfile?.full_name || "Ιδιοκτήτης",
+          caregiverName: caregiverName || "Caregiver",
+          petName: petData.name,
+          startDate: format(new Date(bookingData.start_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          endDate: format(new Date(bookingData.end_date), "d MMM yyyy", {
+            locale: el,
+          }),
+          bookingId: bookingData.id,
+          bookingUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/bookings/${bookingData.id}`,
+        }).catch((error) => {
+          console.error("Failed to send booking cancelled email:", error);
+        });
+      }
+    }
   }
 
   revalidatePath("/dashboard");
@@ -308,6 +558,58 @@ export async function completeBooking(bookingId: string) {
       message: "Μια κράτηση ολοκληρώθηκε επιτυχώς!",
       link: `/bookings/${bookingId}`,
     });
+
+    // Send email notification to owner
+    const { data: bookingData } = await supabase
+      .from("bookings")
+      .select(`
+        id,
+        pets(name),
+        profiles!bookings_owner_id_fkey(full_name, email),
+        caregiver_profiles!inner(
+          profiles(full_name)
+        )
+      `)
+      .eq("id", bookingId)
+      .single();
+
+    if (bookingData) {
+      const ownerProfiles = bookingData.profiles;
+      const ownerProfile = (Array.isArray(ownerProfiles)
+        ? ownerProfiles[0]
+        : ownerProfiles) as { full_name: string; email: string } | null;
+      const caregiverProfiles = bookingData.caregiver_profiles;
+      const caregiverProfileData = Array.isArray(caregiverProfiles)
+        ? caregiverProfiles[0]
+        : caregiverProfiles;
+      const caregiverProfile =
+        caregiverProfileData as unknown as {
+          profiles: { full_name: string } | { full_name: string }[];
+        } | null;
+      const caregiverProfilesNested = caregiverProfile?.profiles;
+      const caregiverProfileInner = Array.isArray(caregiverProfilesNested)
+        ? caregiverProfilesNested[0]
+        : caregiverProfilesNested;
+      const caregiverName = caregiverProfileInner?.full_name || null;
+      const petsData = bookingData.pets;
+      const petData = (Array.isArray(petsData) ? petsData[0] : petsData) as
+        | { name: string }
+        | null;
+
+      if (ownerProfile?.email && petData) {
+        sendBookingCompletedEmail(ownerProfile.email, {
+          ownerName: ownerProfile.full_name || "Ιδιοκτήτης",
+          caregiverName: caregiverName || "Caregiver",
+          petName: petData.name,
+          startDate: "",
+          endDate: "",
+          bookingId: bookingData.id,
+          bookingUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/bookings/${bookingData.id}`,
+        }).catch((error) => {
+          console.error("Failed to send booking completed email:", error);
+        });
+      }
+    }
   }
 
   revalidatePath("/dashboard");
