@@ -16,8 +16,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Waggle",
+  title: {
+    default: "Waggle",
+    template: "%s | Waggle",
+  },
   description: "Waggle -Your best friends favourite app",
+  openGraph: {
+    title: "Waggle",
+    description: "Waggle -Your best friends favourite app",
+  },
 };
 
 export default function RootLayout({
