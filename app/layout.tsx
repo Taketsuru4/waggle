@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Waggle",
-  description: "Waggle-your best friends favourite app",
+  description: "Waggle -Your best friends favourite app",
 };
 
 export default function RootLayout({
